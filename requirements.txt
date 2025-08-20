@@ -5,7 +5,7 @@ numpy
 pandas
 python-dateutil
 requests
-scikit-learn==1.0.2
+scikit-learn==1.7.1
 python-whois
 gunicorn
 Flask-SQLAlchemy
