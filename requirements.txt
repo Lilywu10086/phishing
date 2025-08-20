@@ -1,0 +1,17 @@
+beautifulsoup4
+Flask
+googlesearch-python
+numpy
+pandas
+python-dateutil
+requests
+scikit-learn
+python-whois
+gunicorn
+Flask-SQLAlchemy
+Flask-Login
+Flask-WTF
+Werkzeug
+email_validator
+google
+psutil

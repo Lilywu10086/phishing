@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This website is develop for identify the safety of url.">
+    <meta name="keywords" content="phishing url,phishing,cyber security,machine learning,classifier,python">
+    <meta name="author" content="VAIBHAV BICHAVE">
+
+    <!-- BootStrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        
+    <link href="static/styles.css" rel="stylesheet">
+    <title>Phishing Website Detection System</title>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .user-info {
+            color: white;
+            margin-right: 15px;
+            font-weight: 500;
+        }
+        
+        .main-container {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .detection-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
+        }
+        
+        .detection-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: bold;
+            font-size: 2.2rem;
+        }
+        
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .result-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .feature-cards {
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .feature-card h4 {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .btn {
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .form__input {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .form__input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .button {
+            border-radius: 25px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button1, .button2 {
+            border-radius: 20px;
+            padding: 10px 25px;
+            font-weight: 500;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .button1 {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            color: white;
+        }
+        
+        .button2 {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            border: none;
+            color: white;
+        }
+        
+        .button1:hover, .button2:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .url-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .url-display a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .url-display a:hover {
+            text-decoration: underline;
+        }
+        
+        .prediction-result {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .safe-result {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 2px solid #28a745;
+        }
+        
+        .danger-result {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 2px solid #dc3545;
+        }
+        
+        .sandbox-result {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .sandbox-result h6 {
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .risk-low {
+            border-left-color: #28a745;
+        }
+        
+        .risk-low h6 {
+            color: #28a745;
+        }
+        
+        .risk-medium {
+            border-left-color: #ffc107;
+        }
+        
+        .risk-medium h6 {
+            color: #ffc107;
+        }
+        
+        .risk-high {
+            border-left-color: #dc3545;
+        }
+        
+        .risk-high h6 {
+            color: #dc3545;
+        }
+        
+        .high-risk-warning {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .high-risk-warning h4 {
+            color: #dc3545;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .high-risk-warning p {
+            color: #721c24;
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .detection-section {
+                padding: 20px;
+                margin: 20px 10px;
+            }
+            
+            .detection-title {
+                font-size: 1.8rem;
+            }
+            
+            .feature-card {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .feature-cards .row {
+                margin: 0;
+            }
+            
+            .feature-cards .col-md-6 {
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                🛡️ Phishing Website Detection System
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="user-info">
+                                Welcome, {{ current_user.username }}!
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('batch_detection') }}">Batch Detection</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <!-- Detection Section -->
+        <div class="detection-section">
+            <h1 class="detection-title">Phishing Website Detection</h1>
+            
+            <div class="form-container">
+                <form action="/" method="post">
+                    <div class="form-group">
+                        <input type="text" class="form__input form-control" name="url" id="url" 
+                               placeholder="Enter URL to detect (e.g., https://www.example.com)" required="" />
+                        <label for="url" class="form__label">URL</label>
+                    </div>
+                    <div class="text-center">
+                        <button class="button btn" role="button">Start Detection</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Results Section -->
+            {% if url %}
+            <div class="result-container">
+                <div class="url-display">
+                    <h6><a href="{{ url }}" target="_blank">{{ url }}</a></h6>
+                </div>
+                
+                <!-- Sandbox isolation info -->
+                {% if sandbox_result %}
+                <div class="sandbox-result risk-low">
+                    <h6>🛡️ Sandbox Isolation</h6>
+                    {% if sandbox_report %}
+                    <div style="font-size: 0.9rem; line-height: 1.4;">
+                        {{ sandbox_report | replace('\n', '<br>') | safe }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="prediction-result" id="prediction"></div>
+                
+                <div class="text-center">
+                    <button class="button2 btn" id="button2" role="button" 
+                            onclick="window.open('{{url}}')" target="_blank" style="display: none;">
+                        Continue Anyway
+                    </button>
+                    <button class="button1 btn" id="button1" role="button" 
+                            onclick="window.open('{{url}}')" target="_blank" style="display: none;">
+                        Safe to Continue
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="feature-cards">
+            <div class="row justify-content-center">
+                <div class="col-lg-5 col-md-6 mb-4">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon">📊</div>
+                        <h4>Batch Detection</h4>
+                        <p>Detect multiple URLs at once, supporting up to 50 URLs simultaneously with progress tracking.</p>
+                        <a href="{{ url_for('batch_detection') }}" class="btn btn-primary">Start Batch Detection</a>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-6 mb-4">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon">📈</div>
+                        <h4>History Records</h4>
+                        <p>Login to view detection history and track security trends with detailed statistics.</p>
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('profile') }}" class="btn btn-success">View History</a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Login to View</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+    <script>
+        let x = '{{xx}}';
+        let num = x*100;
+        if (0<=x && x<0.50){
+            num = 100-num;
+        }
+        let txtx = num.toString();
+        
+        if(x<=1 && x>=0.50){
+            var label = "Website safety level: " + txtx + "%";
+            document.getElementById("prediction").innerHTML = label;
+            document.getElementById("prediction").className = "prediction-result safe-result";
+            document.getElementById("button1").style.display="inline-block";
+        }
+        else if (0<=x && x<0.50){
+            var label = "Website danger level: " + txtx + "%";
+            document.getElementById("prediction").innerHTML = label;
+            document.getElementById("prediction").className = "prediction-result danger-result";
+            document.getElementById("button2").style.display="inline-block";
+        }
+    </script>
+</body>
+</html>
+

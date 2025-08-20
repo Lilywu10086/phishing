@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Phishing Website Detection System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <style>
+        .navbar {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        .nav-link:hover {
+            color: white !important;
+        }
+        .profile-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .stats-card {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .history-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+        .safe-url {
+            border-left: 4px solid #28a745;
+        }
+        .unsafe-url {
+            border-left: 4px solid #dc3545;
+        }
+        .btn-back {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .btn-back:hover {
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                🛡️ Phishing Website Detection System
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <span class="text-white">
+                            Welcome, {{ current_user.username }}!
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Back to Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-container">
+            <div class="profile-header">
+                <h2>User Profile</h2>
+                <p class="text-muted">User information and detection history</p>
+            </div>
+
+            <!-- User Information -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4>User Information</h4>
+                    <table class="table">
+                        <tr>
+                            <td><strong>Username:</strong></td>
+                            <td>{{ current_user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email:</strong></td>
+                            <td>{{ current_user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Registration Date:</strong></td>
+                            <td>{{ current_user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% if current_user.last_login %}
+                        <tr>
+                            <td><strong>Last Login:</strong></td>
+                            <td>{{ current_user.last_login.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h4>Detection Statistics</h4>
+                    <div class="stats-card">
+                        <h5>Total Detections</h5>
+                        <h2>{{ total_detections }}</h2>
+                    </div>
+                    <div class="stats-card">
+                        <h5>Safe Websites</h5>
+                        <h2>{{ safe_count }}</h2>
+                    </div>
+                    <div class="stats-card">
+                        <h5>Dangerous Websites</h5>
+                        <h2>{{ unsafe_count }}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detection History -->
+            <div class="row">
+                <div class="col-12">
+                    <h4>Recent Detection History</h4>
+                    {% if detections %}
+                        {% for detection in detections %}
+                        <div class="history-item {{ 'safe-url' if detection.is_safe else 'unsafe-url' }}">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <strong>URL:</strong>
+                                    <a href="{{ detection.url }}" target="_blank">{{ detection.url }}</a>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <span class="badge badge-{{ 'success' if detection.is_safe else 'danger' }}">
+                                        {{ 'Safe' if detection.is_safe else 'Dangerous' }}
+                                    </span>
+                                    <small class="text-muted d-block">
+                                        Confidence: {{ "%.1f"|format(detection.confidence_score * 100) }}%
+                                    </small>
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                Detection Time: {{ detection.detected_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                            </small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted">
+                            <p>No detection history</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="btn-back">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html> 
