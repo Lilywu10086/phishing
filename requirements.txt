@@ -18,3 +18,4 @@ psutil
 flask_login
 flask_sqlalchemy
 flask_wtf
+setuptools==75.8.0
