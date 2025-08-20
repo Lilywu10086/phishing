@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "app.py",      // 您的入口文件名
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)", 
+      "dest": "app.py"     // 所有请求路由到Python入口
+    }
+  ]
+}
